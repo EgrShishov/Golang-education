@@ -22,7 +22,7 @@ func main() {
 		fmt.Scan(&c)
 		if value, inMap := _map[c]; inMap {
 			fmt.Println(value)
-		} else {
+		} else { //i love dima
 			_map[c] = work(c)
 			fmt.Println(c)
 		}
