@@ -2,22 +2,24 @@ package main
 
 import "fmt"
 
-// Дается строка. Нужно удалить все символы, которые встречаются более одного раза и вывести получившуюся строку
+// является ли строка палиндромом
 func main() {
 	var s string
 	fmt.Scan(&s)
+	ans := true
 
-	_map := make(map[rune]int)
-
-	for _, char := range s {
-		_map[char]++
-	}
-	var ans string
-	for char, value := range _map {
-		if value == 1 {
-			ans += string(char)
+	str := []rune(s)
+	for i := 0; i < len(str)/2; i++ {
+		if str[i] != str[len(str)-1-i] {
+			ans = false
+			break
 		}
 	}
 
-	fmt.Print(ans)
+	if ans == true {
+		fmt.Print("Палиндром")
+	} else {
+		fmt.Print("Нет")
+	}
+
 }
