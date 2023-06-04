@@ -24,6 +24,20 @@ type Faculties struct {
 	Id     int    `json:"id"`
 }
 
+type Employee struct {
+	FirstName          string      `json:"firstName"`
+	LastName           string      `json:"lastName"`
+	MiddleName         string      `json:"middleName"`
+	Degree             string      `json:"degree"`
+	Rank               string      `json:"rank"`
+	PhotoLink          string      `json:"photoLink"`
+	CalendarId         string      `json:"calendarId"`
+	AcademicDepartment interface{} `json:"academicDepartment"`
+	Id                 int         `json:"id"`
+	UrlId              string      `json:"urlId"`
+	FIO                string      `json:"fio"`
+}
+
 func FacultiesParse(client *http.Client) {
 	response, err := client.Get("https://iis.bsuir.by/api/v1/faculties")
 	if err != nil {
@@ -79,10 +93,41 @@ func StudentGroupsParse(client *http.Client) {
 	}
 }
 
+func EmployeeParse(client *http.Client) {
+	response, err := client.Get("https://iis.bsuir.by/api/v1/employees/all")
+	if err != nil {
+		fmt.Printf("There are some error with the response body : %s", err)
+		return
+	}
+	//defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		fmt.Printf("Cant read response body : %s", err)
+		return
+	}
+
+	var data []Employee
+	err1 := json.Unmarshal(body, &data)
+	if err1 != nil {
+		fmt.Printf("Cant parse JSON : %s", err1)
+		return
+	}
+
+	fmt.Println("---------------------------Employees---------------------------")
+	i := 1
+	for _, el := range data {
+		fmt.Println(i, " ", el.FirstName, " ", el.MiddleName, " ", el.LastName, " ", el.Id, " ", el.AcademicDepartment, " ", el.Degree,
+			" ", el.PhotoLink, " ", el.Rank, " ", el.UrlId, " ", el.CalendarId, " ", el.FIO)
+		i++
+	}
+}
+
 func main() {
 
 	client := http.Client{}
 
 	StudentGroupsParse(&client)
 	FacultiesParse(&client)
+	EmployeeParse(&client)
 }
