@@ -18,11 +18,41 @@ type Specialities struct {
 	CalendarId                          string `json:"calendarId"`
 }
 
-func main() {
-	var groupNumber int
-	fmt.Scan(&groupNumber)
+type Faculties struct {
+	Name   string `json:"name"`
+	Abbrev string `json:"abbrev"`
+	Id     int    `json:"id"`
+}
 
-	client := http.Client{}
+func FacultiesParse(client *http.Client) {
+	response, err := client.Get("https://iis.bsuir.by/api/v1/faculties")
+	if err != nil {
+		fmt.Printf("There are some error with response body : %s", err)
+		return
+	}
+
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Printf("Cant read response body %s", err)
+		return
+	}
+
+	var facultiesData []Faculties
+	err = json.Unmarshal(body, &facultiesData)
+	if err != nil {
+		fmt.Printf("Cant parse JSON : %s", err)
+		return
+	}
+
+	fmt.Println("----------------------FacultiesInfo--------------------------------------")
+	for _, elem := range facultiesData {
+		fmt.Println(elem.Abbrev, " ", elem.Id, " ", elem.Name)
+	}
+}
+
+func StudentGroupsParse(client *http.Client) {
 	response, err := client.Get("https://iis.bsuir.by/api/v1/student-groups")
 	if err != nil {
 		fmt.Printf("There are some errors with requst : %s", err)
@@ -43,8 +73,16 @@ func main() {
 		return
 	}
 
-	fmt.Println("Id CalendarId Course Name FacultyName FacultyId SpecialityName SpecialityDepartmentEducationFormId")
+	fmt.Println("----------------------Students Groups---------------------------")
 	for _, elem := range data {
 		fmt.Println(elem.Id, " ", elem.CalendarId, " ", elem.Course, " ", elem.Name, " ", elem.FacultyName, " ", elem.FacultyId, " ", elem.SpecialityName, " ", elem.SpecialityDepartmentEducationFormId)
 	}
+}
+
+func main() {
+
+	client := http.Client{}
+
+	StudentGroupsParse(&client)
+	FacultiesParse(&client)
 }
