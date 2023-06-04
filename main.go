@@ -73,7 +73,7 @@ func FacultiesParse(client *http.Client) {
 		return
 	}
 
-	//defer response.Body.Close()
+	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -100,7 +100,7 @@ func StudentGroupsParse(client *http.Client) {
 		fmt.Printf("There are some errors with requst : %s", err)
 		return
 	}
-	//defer response.Body.Close()
+	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -127,7 +127,7 @@ func EmployeeParse(client *http.Client) {
 		fmt.Printf("There are some error with the response body : %s", err)
 		return
 	}
-	//defer response.Body.Close()
+	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -195,7 +195,6 @@ func GetWeakNumber(client *http.Client) int {
 func ShowMenu(client http.Client) {
 
 	for {
-
 		fmt.Println("-----------------------Menu-----------------------\n\n", "Choose option")
 		fmt.Println("0) Exit")
 		fmt.Println("1) Shedule")
@@ -216,29 +215,20 @@ func ShowMenu(client http.Client) {
 			}
 
 		case 2:
-			{
-				StudentGroupsParse(&client)
-			}
+			StudentGroupsParse(&client)
 
 		case 3:
-			{
-				FacultiesParse(&client)
-			}
+			FacultiesParse(&client)
 
 		case 4:
-			{
-				EmployeeParse(&client)
-			}
+			EmployeeParse(&client)
 
 		case 0:
-			{
-				return
-			}
+			return
 
 		}
 
 		fmt.Println("Do you want to continue?")
-
 		var answer string
 		fmt.Scan(&answer)
 
