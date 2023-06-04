@@ -42,13 +42,12 @@ type Employee struct {
 type Shedule struct {
 	EmployeeDto     interface{}      `json:"employeeDto"`
 	StudentGroupDto interface{}      `json:"studentGroupDto"`
-	Schedules       interface{}      `json:"schedules"`
+	Schedules       []SheduleLessons `json:"schedules"`
 	Exams           interface{}      `json:"exams"`
 	StartDate       string           `json:"startDate"`
 	EndDate         string           `json:"endDate"`
 	StartExamsDate  interface{}      `json:"startExamsDate"`
 	EndExamsDate    interface{}      `json:"endExamsDate"`
-	SheduleField    []SheduleLessons `json:"shedule"`
 }
 
 type SheduleLessons struct {
@@ -66,21 +65,26 @@ type SheduleLessons struct {
 	Employees        interface{} `json:"employees"`
 }
 
-func FacultiesParse(client *http.Client) {
-	response, err := client.Get("https://iis.bsuir.by/api/v1/faculties")
+func GetBody(url string, client *http.Client) ([]byte, error) {
+	response, err := client.Get(url)
 	if err != nil {
-		fmt.Printf("There are some error with response body : %s", err)
-		return
+		return nil, err
 	}
 
 	defer response.Body.Close()
-
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		fmt.Printf("Cant read response body %s", err)
+		return nil, err
+	}
+	return body, nil
+}
+
+func FacultiesParse(client *http.Client) {
+	body, err := GetBody("https://iis.bsuir.by/api/v1/faculties", client)
+	if err != nil {
+		fmt.Printf("Problem with response body %s", err)
 		return
 	}
-
 	var facultiesData []Faculties
 	err = json.Unmarshal(body, &facultiesData)
 	if err != nil {
@@ -95,19 +99,11 @@ func FacultiesParse(client *http.Client) {
 }
 
 func StudentGroupsParse(client *http.Client) {
-	response, err := client.Get("https://iis.bsuir.by/api/v1/student-groups")
+	body, err := GetBody("https://iis.bsuir.by/api/v1/student-groups", client)
 	if err != nil {
-		fmt.Printf("There are some errors with requst : %s", err)
+		fmt.Printf("Problem with response body %s", err)
 		return
 	}
-	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		fmt.Printf("Cant read response body : %s", err)
-		return
-	}
-
 	var data []Specialities
 	err = json.Unmarshal(body, &data)
 	if err != nil {
@@ -122,23 +118,15 @@ func StudentGroupsParse(client *http.Client) {
 }
 
 func EmployeeParse(client *http.Client) {
-	response, err := client.Get("https://iis.bsuir.by/api/v1/employees/all")
+	body, err := GetBody("https://iis.bsuir.by/api/v1/employees/all", client)
 	if err != nil {
-		fmt.Printf("There are some error with the response body : %s", err)
+		fmt.Printf("Problem with response body %s", err)
 		return
 	}
-	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		fmt.Printf("Cant read response body : %s", err)
-		return
-	}
-
 	var data []Employee
-	err1 := json.Unmarshal(body, &data)
-	if err1 != nil {
-		fmt.Printf("Cant parse JSON : %s", err1)
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		fmt.Printf("Cant parse JSON : %s", err)
 		return
 	}
 
@@ -152,19 +140,11 @@ func EmployeeParse(client *http.Client) {
 }
 
 func SheduleParse(client *http.Client, groupNumber int) {
-	response, err := client.Get("https://iis.bsuir.by/api/v1/schedule?studentGroup=" + strconv.Itoa(groupNumber))
+	body, err := GetBody("https://iis.bsuir.by/api/v1/schedule?studentGroup="+strconv.Itoa(groupNumber), client)
 	if err != nil {
-		fmt.Printf("There are some error with response body : %s", err)
+		fmt.Printf("Problem with response body %s", err)
 		return
 	}
-
-	defer response.Body.Close()
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		fmt.Printf("Cant read response body : %s", err)
-		return
-	}
-
 	var data []Shedule
 	err = json.Unmarshal(body, &data)
 	if err != nil {
@@ -175,12 +155,15 @@ func SheduleParse(client *http.Client, groupNumber int) {
 	fmt.Println("--------------------------------Shedule--------------------------------")
 	for _, el := range data {
 		fmt.Println(el.EmployeeDto)
+		for _, elem := range el.Schedules {
+			fmt.Println(elem.Auditories, " ", elem.Employees, " ", elem.Note, " ", elem.StudentGroups, " ", elem.NumSubgroup,
+				" ", elem.StartLessonTime, " ", elem.EndLessonTime, " ", elem.DateLesson, " ", elem.Subject)
+		}
 	}
 }
 
 func GetWeakNumber(client *http.Client) int {
 	response, _ := client.Get("https://iis.bsuir.by/api/v1/schedule/current-week")
-
 	defer response.Body.Close()
 	body, _ := io.ReadAll(response.Body)
 	var weakNumber int
@@ -210,6 +193,7 @@ func ShowMenu(client http.Client) {
 		case 1:
 			{
 				var groupNumber int
+				fmt.Println("Enter group number : ")
 				fmt.Scan(&groupNumber)
 				SheduleParse(&client, groupNumber)
 			}
@@ -228,7 +212,7 @@ func ShowMenu(client http.Client) {
 
 		}
 
-		fmt.Println("Do you want to continue?")
+		fmt.Println("\nDo you want to continue?")
 		var answer string
 		fmt.Scan(&answer)
 
@@ -243,10 +227,41 @@ func ShowMenu(client http.Client) {
 	}
 }
 
+func newgcd(a ...int) int {
+	var s []int
+	s = a
+	if len(s) == 2 {
+		return gcd(s[0], s[1])
+	} else {
+		tmp := s[len(s)-1]
+		s = s[:len(s)-1]
+		return gcd(newgcd(s...), tmp)
+	}
+}
+
+func extendedGCD(a, b int) int {
+	return -1
+}
+
+func gcd(a, b int) int {
+	if b == 0 {
+		return a
+	} else {
+		return gcd(b, a%b)
+	}
+}
+
+func mcd(a, b int) int {
+	return a * b / gcd(a, b)
+}
+
 func main() {
-
 	client := http.Client{}
-
 	fmt.Println("Current weak number : ", GetWeakNumber(&client))
 	ShowMenu(client)
+
+	//fmt.Println(gcd(int(a), int(b)))
+	//fmt.Printn(mcd(int(a), int(b)))
+	fmt.Println(gcd(2022, 831))
+	fmt.Println(extendedGCD(12, 4))
 }
