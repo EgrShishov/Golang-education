@@ -39,30 +39,29 @@ type Employee struct {
 	FIO                string      `json:"fio"`
 }
 
-type Shedule struct {
-	EmployeeDto     interface{}      `json:"employeeDto"`
-	StudentGroupDto interface{}      `json:"studentGroupDto"`
-	Schedules       []SheduleLessons `json:"schedules"`
-	Exams           interface{}      `json:"exams"`
-	StartDate       string           `json:"startDate"`
-	EndDate         string           `json:"endDate"`
-	StartExamsDate  interface{}      `json:"startExamsDate"`
-	EndExamsDate    interface{}      `json:"endExamsDate"`
-}
-
-type SheduleLessons struct {
-	WeekNumber       interface{} `json:"weekNumber"`
-	StudentGroups    interface{} `json:"studentGroups"`
-	NumSubgroup      int         `json:"numSubgroup"`
-	Auditories       interface{} `json:"auditories"`
-	StartLessonTime  string      `json:"startLessonTime"`
-	EndLessonTime    string      `json:"endLessonTime"`
-	Subject          string      `json:"subject"`
-	SubjectFullName  string      `json:"subjectFullName"`
-	Note             interface{} `json:"note"`
-	LessonTypeAbbrev string      `json:"lessonTypeAbbrev"`
-	DateLesson       interface{} `json:"dateLesson"`
-	Employees        interface{} `json:"employees"`
+type Schedule struct {
+	EmployeeDto     interface{} `json:"employeeDto"`
+	StudentGroupDto struct {
+		Name        string `json:"name"`
+		FacultyId   int    `json:"facultyId"`
+		FacultyName string `json:"facultyName"`
+		Course      int    `json:"course"`
+		Id          int    `json:"id"`
+		CalendarId  string `json:"calendarId"`
+	} `json:"studentGroupDto"`
+	Schedules struct {
+		Monday    []interface{} `json:"Понедельник"`
+		Tuesday   []interface{} `json:"Вторник"`
+		Wednesday []interface{} `json:"Среда"`
+		Thursday  []interface{} `json:"Четверг"`
+		Friday    []interface{} `json:"Пятница"`
+		Saturday  []interface{} `json:"Суббота"`
+	} `json:"schedules"`
+	Exams          []interface{} `json:"exams"`
+	StartDate      string        `json:"startDate"`
+	EndDate        string        `json:"endDate"`
+	StartExamsDate interface{}   `json:"startExamsDate"`
+	EndExamsDate   interface{}   `json:"endExamsDate"`
 }
 
 func GetBody(url string, client *http.Client) ([]byte, error) {
@@ -139,26 +138,60 @@ func EmployeeParse(client *http.Client) {
 	}
 }
 
-func SheduleParse(client *http.Client, groupNumber int) {
+func ShowDaysLessons(item interface{}) {
+	scheduleItem := item.(map[string]interface{})
+	if subject, ok := scheduleItem["subject"].(string); ok {
+		fmt.Print("Subject : ", subject)
+	}
+	if startTime, ok := scheduleItem["startTime"].(string); ok {
+		fmt.Print("Subject : ", startTime)
+	}
+	if endTime, ok := scheduleItem["endTime"].(string); ok {
+		fmt.Print("Subject : ", endTime)
+	}
+	if location, ok := scheduleItem["location"].(string); ok {
+		fmt.Print("Subject : ", location)
+	}
+	fmt.Println()
+}
+
+func ScheduleParse(client *http.Client, groupNumber int) {
 	body, err := GetBody("https://iis.bsuir.by/api/v1/schedule?studentGroup="+strconv.Itoa(groupNumber), client)
 	if err != nil {
 		fmt.Printf("Problem with response body %s", err)
 		return
 	}
-	var data []Shedule
+	var data Schedule
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		fmt.Printf("Cant parse JSON : %s", err)
 		return
 	}
 
-	fmt.Println("--------------------------------Shedule--------------------------------")
-	for _, el := range data {
-		fmt.Println(el.EmployeeDto)
-		for _, elem := range el.Schedules {
-			fmt.Println(elem.Auditories, " ", elem.Employees, " ", elem.Note, " ", elem.StudentGroups, " ", elem.NumSubgroup,
-				" ", elem.StartLessonTime, " ", elem.EndLessonTime, " ", elem.DateLesson, " ", elem.Subject)
-		}
+	fmt.Println("--------------------------------Schedule--------------------------------")
+	fmt.Println("Monday : ")
+	for _, item := range data.Schedules.Monday {
+		ShowDaysLessons(item)
+	}
+	fmt.Println("Tuesday : ")
+	for _, item := range data.Schedules.Tuesday {
+		ShowDaysLessons(item)
+	}
+	fmt.Println("Wednesday : ")
+	for _, item := range data.Schedules.Wednesday {
+		ShowDaysLessons(item)
+	}
+	fmt.Println("Thursday : ")
+	for _, item := range data.Schedules.Thursday {
+		ShowDaysLessons(item)
+	}
+	fmt.Println("Friday : ")
+	for _, item := range data.Schedules.Friday {
+		ShowDaysLessons(item)
+	}
+	fmt.Println("Saturday : ")
+	for _, item := range data.Schedules.Saturday {
+		ShowDaysLessons(item)
 	}
 }
 
@@ -176,7 +209,6 @@ func GetWeakNumber(client *http.Client) int {
 }
 
 func ShowMenu(client http.Client) {
-
 	for {
 		fmt.Println("-----------------------Menu-----------------------\n\n", "Choose option")
 		fmt.Println("0) Exit")
@@ -187,7 +219,6 @@ func ShowMenu(client http.Client) {
 
 		var choice int
 		fmt.Scan(&choice)
-
 		switch choice {
 
 		case 1:
@@ -195,7 +226,7 @@ func ShowMenu(client http.Client) {
 				var groupNumber int
 				fmt.Println("Enter group number : ")
 				fmt.Scan(&groupNumber)
-				SheduleParse(&client, groupNumber)
+				ScheduleParse(&client, groupNumber)
 			}
 
 		case 2:
@@ -209,7 +240,6 @@ func ShowMenu(client http.Client) {
 
 		case 0:
 			return
-
 		}
 
 		fmt.Println("\nDo you want to continue?")
@@ -239,10 +269,6 @@ func newgcd(a ...int) int {
 	}
 }
 
-func extendedGCD(a, b int) int {
-	return -1
-}
-
 func gcd(a, b int) int {
 	if b == 0 {
 		return a
@@ -260,8 +286,5 @@ func main() {
 	fmt.Println("Current weak number : ", GetWeakNumber(&client))
 	ShowMenu(client)
 
-	//fmt.Println(gcd(int(a), int(b)))
-	//fmt.Printn(mcd(int(a), int(b)))
 	fmt.Println(gcd(2022, 831))
-	fmt.Println(extendedGCD(12, 4))
 }
