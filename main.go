@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -78,42 +79,44 @@ func GetBody(url string, client *http.Client) ([]byte, error) {
 	return body, nil
 }
 
-func FacultiesParse(client *http.Client) {
+func FacultiesParse(client *http.Client) []Faculties {
 	body, err := GetBody("https://iis.bsuir.by/api/v1/faculties", client)
 	if err != nil {
 		fmt.Printf("Problem with response body %s", err)
-		return
+		return nil
 	}
 	var facultiesData []Faculties
 	err = json.Unmarshal(body, &facultiesData)
 	if err != nil {
 		fmt.Printf("Cant parse JSON : %s", err)
-		return
+		return nil
 	}
 
 	fmt.Println("----------------------FacultiesInfo--------------------------------------")
 	for _, elem := range facultiesData {
 		fmt.Println(elem.Abbrev, " ", elem.Id, " ", elem.Name)
 	}
+	return facultiesData
 }
 
-func StudentGroupsParse(client *http.Client) {
+func StudentGroupsParse(client *http.Client) []Specialities {
 	body, err := GetBody("https://iis.bsuir.by/api/v1/student-groups", client)
 	if err != nil {
 		fmt.Printf("Problem with response body %s", err)
-		return
+		return nil
 	}
 	var data []Specialities
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		fmt.Printf("Cant parse JSON: %s", err)
-		return
+		return nil
 	}
 
 	fmt.Println("----------------------Students Groups---------------------------")
 	for _, elem := range data {
 		fmt.Println(elem.Id, " ", elem.CalendarId, " ", elem.Course, " ", elem.Name, " ", elem.FacultyName, " ", elem.FacultyId, " ", elem.SpecialityName, " ", elem.SpecialityDepartmentEducationFormId)
 	}
+	return data
 }
 
 func EmployeeParse(client *http.Client) {
@@ -208,11 +211,47 @@ func GetWeakNumber(client *http.Client) int {
 	return weakNumber
 }
 
+func CreateReport(data interface{}, name string) (*os.File, error) {
+	file, err := os.Open(name)
+	if err != nil {
+		fmt.Printf("There are some error with the file : %s", err)
+		file, err = os.Create(name)
+		if err != nil {
+			fmt.Printf("Error : %s", err)
+			return nil, err
+		}
+	}
+
+	if obj, ok := data.([]Faculties); ok {
+		for _, el := range obj {
+			file.WriteString(el.Name + ", ")
+			file.WriteString(el.Abbrev + ", ")
+			file.WriteString(strconv.Itoa(el.Id) + "\n")
+		}
+	}
+
+	if obj, ok := data.([]Specialities); ok {
+		for _, el := range obj {
+			file.WriteString(el.Name + ", ")
+			file.WriteString(el.CalendarId + ", ")
+			file.WriteString(strconv.Itoa(el.Id) + "\n")
+			file.WriteString(el.FacultyName + "\n")
+			file.WriteString(el.SpecialityName + "\n")
+			file.WriteString(strconv.Itoa(el.Course) + "\n")
+			file.WriteString(strconv.Itoa(el.FacultyId) + "\n")
+			file.WriteString(strconv.Itoa(el.SpecialityDepartmentEducationFormId) + "\n")
+		}
+	}
+
+	defer file.Close()
+	return file, nil
+}
+
 func ShowMenu(client http.Client) {
 	for {
 		fmt.Println("-----------------------Menu-----------------------\n\n", "Choose option")
 		fmt.Println("0) Exit")
-		fmt.Println("1) Shedule")
+		fmt.Println("1) Schedule")
 		fmt.Println("2) Student group")
 		fmt.Println("3) Faculties")
 		fmt.Println("4) Employees")
@@ -230,14 +269,13 @@ func ShowMenu(client http.Client) {
 			}
 
 		case 2:
-			StudentGroupsParse(&client)
-
+			data := StudentGroupsParse(&client)
+			CreateReport(data, "output.txt")
 		case 3:
-			FacultiesParse(&client)
-
+			data := FacultiesParse(&client)
+			CreateReport(data, "output.txt")
 		case 4:
 			EmployeeParse(&client)
-
 		case 0:
 			return
 		}
@@ -257,34 +295,8 @@ func ShowMenu(client http.Client) {
 	}
 }
 
-func newgcd(a ...int) int {
-	var s []int
-	s = a
-	if len(s) == 2 {
-		return gcd(s[0], s[1])
-	} else {
-		tmp := s[len(s)-1]
-		s = s[:len(s)-1]
-		return gcd(newgcd(s...), tmp)
-	}
-}
-
-func gcd(a, b int) int {
-	if b == 0 {
-		return a
-	} else {
-		return gcd(b, a%b)
-	}
-}
-
-func mcd(a, b int) int {
-	return a * b / gcd(a, b)
-}
-
 func main() {
 	client := http.Client{}
 	fmt.Println("Current weak number : ", GetWeakNumber(&client))
 	ShowMenu(client)
-
-	fmt.Println(gcd(2022, 831))
 }
