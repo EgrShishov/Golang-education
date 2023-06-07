@@ -236,22 +236,25 @@ func SeeExams(exams []Exams) {
 		for _, el := range exams.WeekNumber {
 			fmt.Println("Week number :")
 			fmt.Print(el)
+			fmt.Println()
 		}
 		fmt.Println("Student groups : ")
 		for _, el := range exams.StudentGroups {
 			fmt.Println(el.NumberOfStudents, " ", el.Name, " ",
 				el.NumberOfStudents, " ", el.SpecialityName, " ", el.SpecialityCode)
 		}
+		fmt.Println("---------------------------------------------------------")
 		fmt.Println("Num of subgroup : ", exams.NumSubgroup)
 		fmt.Println("Subject : ", exams.Subject)
 		fmt.Println("Date lesson : ", exams.DateLesson)
 		fmt.Println("Start Lesson Time : ", exams.StartLessonTime)
 		fmt.Println("End Lesson Time : ", exams.EndLessonTime)
 		fmt.Println("Lesson Type : ", exams.LessonTypeAbbrev)
-		fmt.Println("Auditories : ")
+		fmt.Print("Auditories : ")
 		for _, el := range exams.Auditories {
 			fmt.Print(el)
 		}
+		fmt.Println()
 	}
 }
 
