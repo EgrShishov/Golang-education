@@ -303,6 +303,18 @@ func CreateReport(data interface{}, name string) (*os.File, error) {
 	return file, nil
 }
 
+func WriteJSONExams(name string, data []Exams) error {
+	file, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_APPEND, os.ModePerm)
+	defer file.Close()
+	if err != nil {
+		return err
+	}
+
+	asJson, _ := json.MarshalIndent(data, "", "\t")
+	file.Write(asJson)
+	return nil
+}
+
 func ShowMenu(client http.Client) {
 	for {
 		fmt.Println("-----------------------Menu-----------------------\n\n", "Choose option")
@@ -328,6 +340,11 @@ func ShowMenu(client http.Client) {
 				fmt.Scan(&ans)
 				if ans == "yes" {
 					SeeExams(tmp)
+					if err := WriteJSONExams("json_test.txt", tmp); err != nil {
+						fmt.Printf("There are some error with writting in the file : %s", err)
+						return
+					}
+					fmt.Println("Successfully wrote!")
 				}
 			}
 
