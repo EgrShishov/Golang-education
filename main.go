@@ -40,6 +40,26 @@ type Employee struct {
 	FIO                string      `json:"fio"`
 }
 
+type Exams struct {
+	WeekNumber    []int `json:"weekNumber"`
+	StudentGroups []struct {
+		SpecialityName   string `json:"specialityName"`
+		SpecialityCode   string `json:"specialityCode"`
+		NumberOfStudents int    `json:"numberOfStudents"`
+		Name             string `json:"name"`
+	} `json:"studentGroups"`
+	NumSubgroup      int         `json:"numSubgroup"`
+	Auditories       []string    `json:"auditories"`
+	StartLessonTime  string      `json:"startLessonTime"`
+	EndLessonTime    string      `json:"endLessonTime"`
+	Subject          string      `json:"subject"`
+	SubjectFullName  string      `json:"subjectFullName"`
+	Note             interface{} `json:"note"`
+	LessonTypeAbbrev string      `json:"lessonTypeAbbrev"`
+	DateLesson       string      `json:"dateLesson"`
+	Employees        []Employee  `json:"employees"`
+}
+
 type Schedule struct {
 	EmployeeDto     interface{} `json:"employeeDto"`
 	StudentGroupDto struct {
@@ -58,11 +78,11 @@ type Schedule struct {
 		Friday    []interface{} `json:"Пятница"`
 		Saturday  []interface{} `json:"Суббота"`
 	} `json:"schedules"`
-	Exams          []interface{} `json:"exams"`
-	StartDate      string        `json:"startDate"`
-	EndDate        string        `json:"endDate"`
-	StartExamsDate interface{}   `json:"startExamsDate"`
-	EndExamsDate   interface{}   `json:"endExamsDate"`
+	Exams          []Exams     `json:"exams"`
+	StartDate      string      `json:"startDate"`
+	EndDate        string      `json:"endDate"`
+	StartExamsDate interface{} `json:"startExamsDate"`
+	EndExamsDate   interface{} `json:"endExamsDate"`
 }
 
 func GetBody(url string, client *http.Client) ([]byte, error) {
@@ -158,17 +178,17 @@ func ShowDaysLessons(item interface{}) {
 	fmt.Println()
 }
 
-func ScheduleParse(client *http.Client, groupNumber int) {
+func ScheduleParse(client *http.Client, groupNumber int) ([]Exams, error) {
 	body, err := GetBody("https://iis.bsuir.by/api/v1/schedule?studentGroup="+strconv.Itoa(groupNumber), client)
 	if err != nil {
 		fmt.Printf("Problem with response body %s", err)
-		return
+		return nil, err
 	}
 	var data Schedule
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		fmt.Printf("Cant parse JSON : %s", err)
-		return
+		return nil, err
 	}
 
 	fmt.Println("--------------------------------Schedule--------------------------------")
@@ -196,6 +216,43 @@ func ScheduleParse(client *http.Client, groupNumber int) {
 	for _, item := range data.Schedules.Saturday {
 		ShowDaysLessons(item)
 	}
+
+	fmt.Println("---------------------------Students group---------------------------")
+	el := data.StudentGroupDto
+	fmt.Println(el.Id, " ", el.CalendarId, " ", el.Name, " ",
+		el.FacultyId, " ", el.FacultyName, " ", el.Name, " ", el.Course)
+
+	fmt.Println("Start date : ", data.StartDate)
+	fmt.Println("End date : ", data.EndDate)
+	fmt.Println("Exams start date : ", data.StartExamsDate.(string))
+	fmt.Println("End exams date : ", data.EndExamsDate.(string))
+
+	return data.Exams, nil
+}
+
+func SeeExams(exams []Exams) {
+	fmt.Println("---------------------------Exams---------------------------")
+	for _, exams := range exams {
+		for _, el := range exams.WeekNumber {
+			fmt.Println("Week number :")
+			fmt.Print(el)
+		}
+		fmt.Println("Student groups : ")
+		for _, el := range exams.StudentGroups {
+			fmt.Println(el.NumberOfStudents, " ", el.Name, " ",
+				el.NumberOfStudents, " ", el.SpecialityName, " ", el.SpecialityCode)
+		}
+		fmt.Println("Num of subgroup : ", exams.NumSubgroup)
+		fmt.Println("Subject : ", exams.Subject)
+		fmt.Println("Date lesson : ", exams.DateLesson)
+		fmt.Println("Start Lesson Time : ", exams.StartLessonTime)
+		fmt.Println("End Lesson Time : ", exams.EndLessonTime)
+		fmt.Println("Lesson Type : ", exams.LessonTypeAbbrev)
+		fmt.Println("Auditories : ")
+		for _, el := range exams.Auditories {
+			fmt.Print(el)
+		}
+	}
 }
 
 func GetWeakNumber(client *http.Client) int {
@@ -212,14 +269,11 @@ func GetWeakNumber(client *http.Client) int {
 }
 
 func CreateReport(data interface{}, name string) (*os.File, error) {
-	file, err := os.Open(name)
+	file, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	defer file.Close()
 	if err != nil {
 		fmt.Printf("There are some error with the file : %s", err)
-		file, err = os.Create(name)
-		if err != nil {
-			fmt.Printf("Error : %s", err)
-			return nil, err
-		}
+		return nil, err
 	}
 
 	if obj, ok := data.([]Faculties); ok {
@@ -243,7 +297,6 @@ func CreateReport(data interface{}, name string) (*os.File, error) {
 		}
 	}
 
-	defer file.Close()
 	return file, nil
 }
 
@@ -265,7 +318,14 @@ func ShowMenu(client http.Client) {
 				var groupNumber int
 				fmt.Println("Enter group number : ")
 				fmt.Scan(&groupNumber)
-				ScheduleParse(&client, groupNumber)
+				tmp, _ := ScheduleParse(&client, groupNumber)
+
+				fmt.Println("Do you wanna see exams?")
+				var ans string
+				fmt.Scan(&ans)
+				if ans == "yes" {
+					SeeExams(tmp)
+				}
 			}
 
 		case 2:
