@@ -272,7 +272,7 @@ func GetWeakNumber(client *http.Client) int {
 }
 
 func CreateReport(data interface{}, name string) (*os.File, error) {
-	file, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	file, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
 	defer file.Close()
 	if err != nil {
 		fmt.Printf("There are some error with the file : %s", err)
@@ -325,19 +325,32 @@ func ShowMenu(client http.Client) {
 		fmt.Println("4) Employees")
 
 		var choice int
-		fmt.Scan(&choice)
+		_, err := fmt.Scan(&choice)
+		if err != nil {
+			fmt.Printf("Input error : %s", err)
+			return
+		}
+
 		switch choice {
 
 		case 1:
 			{
 				var groupNumber int
 				fmt.Println("Enter group number : ")
-				fmt.Scan(&groupNumber)
+				_, err := fmt.Scan(&groupNumber)
+				if err != nil {
+					fmt.Printf("Input error : %s", err)
+					return
+				}
 				tmp, _ := ScheduleParse(&client, groupNumber)
 
 				fmt.Println("Do you wanna see exams?")
 				var ans string
-				fmt.Scan(&ans)
+				_, err = fmt.Scan(&ans)
+				if err != nil {
+					fmt.Printf("Input error : %s", err)
+					return
+				}
 				if ans == "yes" {
 					SeeExams(tmp)
 					if err := WriteJSONExams("json_test.txt", tmp); err != nil {
@@ -350,10 +363,10 @@ func ShowMenu(client http.Client) {
 
 		case 2:
 			data := StudentGroupsParse(&client)
-			CreateReport(data, "output.txt")
+			_, _ = CreateReport(data, "output.txt")
 		case 3:
 			data := FacultiesParse(&client)
-			CreateReport(data, "output.txt")
+			_, _ = CreateReport(data, "output.txt")
 		case 4:
 			EmployeeParse(&client)
 		case 0:
@@ -362,7 +375,11 @@ func ShowMenu(client http.Client) {
 
 		fmt.Println("\nDo you want to continue?")
 		var answer string
-		fmt.Scan(&answer)
+		_, err = fmt.Scan(&answer)
+		if err != nil {
+			fmt.Printf("Input error : %s", err)
+			return
+		}
 
 		if answer == "yes" {
 			continue
