@@ -281,22 +281,22 @@ func CreateReport(data interface{}, name string) (*os.File, error) {
 
 	if obj, ok := data.([]Faculties); ok {
 		for _, el := range obj {
-			file.WriteString(el.Name + ", ")
-			file.WriteString(el.Abbrev + ", ")
-			file.WriteString(strconv.Itoa(el.Id) + "\n")
+			_, _ = file.WriteString(el.Name + ", ")
+			_, _ = file.WriteString(el.Abbrev + ", ")
+			_, _ = file.WriteString(strconv.Itoa(el.Id) + "\n")
 		}
 	}
 
 	if obj, ok := data.([]Specialities); ok {
 		for _, el := range obj {
-			file.WriteString(el.Name + ", ")
-			file.WriteString(el.CalendarId + ", ")
-			file.WriteString(strconv.Itoa(el.Id) + "\n")
-			file.WriteString(el.FacultyName + "\n")
-			file.WriteString(el.SpecialityName + "\n")
-			file.WriteString(strconv.Itoa(el.Course) + "\n")
-			file.WriteString(strconv.Itoa(el.FacultyId) + "\n")
-			file.WriteString(strconv.Itoa(el.SpecialityDepartmentEducationFormId) + "\n")
+			_, _ = file.WriteString(el.Name + ", ")
+			_, _ = file.WriteString(el.CalendarId + ", ")
+			_, _ = file.WriteString(strconv.Itoa(el.Id) + "\n")
+			_, _ = file.WriteString(el.FacultyName + "\n")
+			_, _ = file.WriteString(el.SpecialityName + "\n")
+			_, _ = file.WriteString(strconv.Itoa(el.Course) + "\n")
+			_, _ = file.WriteString(strconv.Itoa(el.FacultyId) + "\n")
+			_, _ = file.WriteString(strconv.Itoa(el.SpecialityDepartmentEducationFormId) + "\n")
 		}
 	}
 
@@ -311,8 +311,21 @@ func WriteJSONExams(name string, data []Exams) error {
 	}
 
 	asJson, _ := json.MarshalIndent(data, "", "\t")
-	file.Write(asJson)
+	_, _ = file.Write(asJson)
 	return nil
+}
+
+func ReadFromFile(name string) {
+	file, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	defer file.Close()
+	if err != nil {
+		fmt.Printf("There are error with reading from file : %s", err)
+		return
+	}
+
+	content, _ := os.ReadFile(name)
+	println(string(content))
+	fmt.Println("Reading status: Success!")
 }
 
 func ShowMenu(client http.Client) {
@@ -394,6 +407,12 @@ func ShowMenu(client http.Client) {
 
 func main() {
 	client := http.Client{}
+
+	var name string
+	fmt.Println("Input file name with .txt")
+	_, _ = fmt.Scan(&name)
+	ReadFromFile(name)
+
 	fmt.Println("Current weak number : ", GetWeakNumber(&client))
 	ShowMenu(client)
 }
