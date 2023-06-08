@@ -323,9 +323,13 @@ func ReadFromFile(name string) {
 		return
 	}
 
-	content, _ := os.ReadFile(name)
+	content, err := os.ReadFile(name)
+	if err != nil {
+		fmt.Printf("There are some error : %s", err)
+		return
+	}
 	println(string(content))
-	fmt.Println("Reading status: Success!")
+	println("Reading status: Success!")
 }
 
 func ShowMenu(client http.Client) {
