@@ -1666,4 +1666,395 @@
 			}
 		]
 	}
+][
+	{
+		"weekNumber": [
+			1
+		],
+		"studentGroups": [
+			{
+				"specialityName": "Информатика и технологии программирования",
+				"specialityCode": "1-40 01 03",
+				"numberOfStudents": 25,
+				"name": "253502"
+			}
+		],
+		"numSubgroup": 0,
+		"auditories": [
+			"322-4 к."
+		],
+		"startLessonTime": "14:00",
+		"endLessonTime": "15:00",
+		"subject": "ОВА",
+		"subjectFullName": "Основы высшей алгебры",
+		"note": null,
+		"lessonTypeAbbrev": "Консультация",
+		"dateLesson": "05.06.2023",
+		"employees": [
+			{
+				"firstName": "Елена",
+				"lastName": "Стройникова",
+				"middleName": "Дмитриевна",
+				"degree": "",
+				"rank": "",
+				"photoLink": "https://iis.bsuir.by/api/v1/employees/photo/500740",
+				"calendarId": "8j81sek97lccvngha1fdpi31bs@group.calendar.google.com",
+				"academicDepartment": null,
+				"id": 500740,
+				"urlId": "e-strojnikova",
+				"fio": ""
+			}
+		]
+	},
+	{
+		"weekNumber": [
+			1
+		],
+		"studentGroups": [
+			{
+				"specialityName": "Информатика и технологии программирования",
+				"specialityCode": "1-40 01 03",
+				"numberOfStudents": 25,
+				"name": "253502"
+			}
+		],
+		"numSubgroup": 0,
+		"auditories": [
+			"322-4 к."
+		],
+		"startLessonTime": "09:00",
+		"endLessonTime": "14:00",
+		"subject": "ОВА",
+		"subjectFullName": "Основы высшей алгебры",
+		"note": null,
+		"lessonTypeAbbrev": "Экзамен",
+		"dateLesson": "06.06.2023",
+		"employees": [
+			{
+				"firstName": "Елена",
+				"lastName": "Стройникова",
+				"middleName": "Дмитриевна",
+				"degree": "",
+				"rank": "",
+				"photoLink": "https://iis.bsuir.by/api/v1/employees/photo/500740",
+				"calendarId": "8j81sek97lccvngha1fdpi31bs@group.calendar.google.com",
+				"academicDepartment": null,
+				"id": 500740,
+				"urlId": "e-strojnikova",
+				"fio": ""
+			}
+		]
+	},
+	{
+		"weekNumber": [
+			1
+		],
+		"studentGroups": [
+			{
+				"specialityName": "Информатика и технологии программирования",
+				"specialityCode": "1-40 01 03",
+				"numberOfStudents": 25,
+				"name": "253502"
+			}
+		],
+		"numSubgroup": 0,
+		"auditories": [
+			"501-4 к."
+		],
+		"startLessonTime": "14:00",
+		"endLessonTime": "15:00",
+		"subject": "Физика",
+		"subjectFullName": "Физика",
+		"note": null,
+		"lessonTypeAbbrev": "Консультация",
+		"dateLesson": "09.06.2023",
+		"employees": [
+			{
+				"firstName": "Елена",
+				"lastName": "Храмович",
+				"middleName": "Минаевна",
+				"degree": "кандидат физико-математических наук",
+				"rank": "доцент",
+				"photoLink": "https://iis.bsuir.by/api/v1/employees/photo/541980",
+				"calendarId": "m770kiva6mavt6j0a1ll2aa7bg@group.calendar.google.com",
+				"academicDepartment": null,
+				"id": 541980,
+				"urlId": "e-khramovich",
+				"fio": ""
+			}
+		]
+	},
+	{
+		"weekNumber": [
+			1
+		],
+		"studentGroups": [
+			{
+				"specialityName": "Информатика и технологии программирования",
+				"specialityCode": "1-40 01 03",
+				"numberOfStudents": 25,
+				"name": "253502"
+			}
+		],
+		"numSubgroup": 0,
+		"auditories": [
+			"501-4 к."
+		],
+		"startLessonTime": "09:00",
+		"endLessonTime": "14:00",
+		"subject": "Физика",
+		"subjectFullName": "Физика",
+		"note": null,
+		"lessonTypeAbbrev": "Экзамен",
+		"dateLesson": "10.06.2023",
+		"employees": [
+			{
+				"firstName": "Елена",
+				"lastName": "Храмович",
+				"middleName": "Минаевна",
+				"degree": "кандидат физико-математических наук",
+				"rank": "доцент",
+				"photoLink": "https://iis.bsuir.by/api/v1/employees/photo/541980",
+				"calendarId": "m770kiva6mavt6j0a1ll2aa7bg@group.calendar.google.com",
+				"academicDepartment": null,
+				"id": 541980,
+				"urlId": "e-khramovich",
+				"fio": ""
+			}
+		]
+	},
+	{
+		"weekNumber": [
+			2
+		],
+		"studentGroups": [
+			{
+				"specialityName": "Информатика и технологии программирования",
+				"specialityCode": "1-40 01 03",
+				"numberOfStudents": 25,
+				"name": "253502"
+			}
+		],
+		"numSubgroup": 0,
+		"auditories": [
+			"401-4 к."
+		],
+		"startLessonTime": "15:00",
+		"endLessonTime": "16:00",
+		"subject": "ИнЯз",
+		"subjectFullName": "Иностранный язык",
+		"note": null,
+		"lessonTypeAbbrev": "Консультация",
+		"dateLesson": "16.06.2023",
+		"employees": [
+			{
+				"firstName": "Татьяна",
+				"lastName": "Булавская",
+				"middleName": "Владимировна",
+				"degree": "",
+				"rank": "",
+				"photoLink": "https://iis.bsuir.by/api/v1/employees/photo/501025",
+				"calendarId": "g0g21pe3dlquueej6dqjii0h28@group.calendar.google.com",
+				"academicDepartment": null,
+				"id": 501025,
+				"urlId": "t-bulavskaia",
+				"fio": ""
+			}
+		]
+	},
+	{
+		"weekNumber": [
+			3
+		],
+		"studentGroups": [
+			{
+				"specialityName": "Информатика и технологии программирования",
+				"specialityCode": "1-40 01 03",
+				"numberOfStudents": 25,
+				"name": "253502"
+			}
+		],
+		"numSubgroup": 0,
+		"auditories": [
+			"401-4 к."
+		],
+		"startLessonTime": "09:00",
+		"endLessonTime": "14:00",
+		"subject": "ИнЯз",
+		"subjectFullName": "Иностранный язык",
+		"note": null,
+		"lessonTypeAbbrev": "Экзамен",
+		"dateLesson": "19.06.2023",
+		"employees": [
+			{
+				"firstName": "Татьяна",
+				"lastName": "Булавская",
+				"middleName": "Владимировна",
+				"degree": "",
+				"rank": "",
+				"photoLink": "https://iis.bsuir.by/api/v1/employees/photo/501025",
+				"calendarId": "g0g21pe3dlquueej6dqjii0h28@group.calendar.google.com",
+				"academicDepartment": null,
+				"id": 501025,
+				"urlId": "t-bulavskaia",
+				"fio": ""
+			}
+		]
+	},
+	{
+		"weekNumber": [
+			3
+		],
+		"studentGroups": [
+			{
+				"specialityName": "Информатика и технологии программирования",
+				"specialityCode": "1-40 01 03",
+				"numberOfStudents": 25,
+				"name": "253502"
+			}
+		],
+		"numSubgroup": 0,
+		"auditories": [
+			"207а-5 к."
+		],
+		"startLessonTime": "14:00",
+		"endLessonTime": "15:00",
+		"subject": "ОАиП",
+		"subjectFullName": "Основы алгоритмизации и программирования",
+		"note": null,
+		"lessonTypeAbbrev": "Консультация",
+		"dateLesson": "21.06.2023",
+		"employees": [
+			{
+				"firstName": "Сергей",
+				"lastName": "Мигалевич",
+				"middleName": "Александрович",
+				"degree": "",
+				"rank": "",
+				"photoLink": "https://iis.bsuir.by/api/v1/employees/photo/500043",
+				"calendarId": "2he8md8im6mlfj0lrvdli82g08@group.calendar.google.com",
+				"academicDepartment": null,
+				"id": 500043,
+				"urlId": "s-migalevich",
+				"fio": ""
+			}
+		]
+	},
+	{
+		"weekNumber": [
+			3
+		],
+		"studentGroups": [
+			{
+				"specialityName": "Информатика и технологии программирования",
+				"specialityCode": "1-40 01 03",
+				"numberOfStudents": 25,
+				"name": "253502"
+			}
+		],
+		"numSubgroup": 0,
+		"auditories": [
+			"207а-5 к."
+		],
+		"startLessonTime": "09:00",
+		"endLessonTime": "14:00",
+		"subject": "ОАиП",
+		"subjectFullName": "Основы алгоритмизации и программирования",
+		"note": null,
+		"lessonTypeAbbrev": "Экзамен",
+		"dateLesson": "23.06.2023",
+		"employees": [
+			{
+				"firstName": "Сергей",
+				"lastName": "Мигалевич",
+				"middleName": "Александрович",
+				"degree": "",
+				"rank": "",
+				"photoLink": "https://iis.bsuir.by/api/v1/employees/photo/500043",
+				"calendarId": "2he8md8im6mlfj0lrvdli82g08@group.calendar.google.com",
+				"academicDepartment": null,
+				"id": 500043,
+				"urlId": "s-migalevich",
+				"fio": ""
+			}
+		]
+	},
+	{
+		"weekNumber": [
+			4
+		],
+		"studentGroups": [
+			{
+				"specialityName": "Информатика и технологии программирования",
+				"specialityCode": "1-40 01 03",
+				"numberOfStudents": 25,
+				"name": "253502"
+			}
+		],
+		"numSubgroup": 0,
+		"auditories": [
+			"320-4 к."
+		],
+		"startLessonTime": "14:00",
+		"endLessonTime": "15:00",
+		"subject": "МА",
+		"subjectFullName": "Математический анализ",
+		"note": null,
+		"lessonTypeAbbrev": "Консультация",
+		"dateLesson": "27.06.2023",
+		"employees": [
+			{
+				"firstName": "Зоя",
+				"lastName": "Примичева",
+				"middleName": "Николаевна",
+				"degree": "кандидат физико-математических наук",
+				"rank": "доцент",
+				"photoLink": "https://iis.bsuir.by/api/v1/employees/photo/500661",
+				"calendarId": "cs535thcol6pvrrket003c3s68@group.calendar.google.com",
+				"academicDepartment": null,
+				"id": 500661,
+				"urlId": "z-primicheva",
+				"fio": ""
+			}
+		]
+	},
+	{
+		"weekNumber": [
+			4
+		],
+		"studentGroups": [
+			{
+				"specialityName": "Информатика и технологии программирования",
+				"specialityCode": "1-40 01 03",
+				"numberOfStudents": 25,
+				"name": "253502"
+			}
+		],
+		"numSubgroup": 0,
+		"auditories": [
+			"320-4 к."
+		],
+		"startLessonTime": "16:00",
+		"endLessonTime": "22:00",
+		"subject": "МА",
+		"subjectFullName": "Математический анализ",
+		"note": null,
+		"lessonTypeAbbrev": "Экзамен",
+		"dateLesson": "28.06.2023",
+		"employees": [
+			{
+				"firstName": "Зоя",
+				"lastName": "Примичева",
+				"middleName": "Николаевна",
+				"degree": "кандидат физико-математических наук",
+				"rank": "доцент",
+				"photoLink": "https://iis.bsuir.by/api/v1/employees/photo/500661",
+				"calendarId": "cs535thcol6pvrrket003c3s68@group.calendar.google.com",
+				"academicDepartment": null,
+				"id": 500661,
+				"urlId": "z-primicheva",
+				"fio": ""
+			}
+		]
+	}
 ]

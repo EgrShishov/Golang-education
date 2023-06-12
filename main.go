@@ -175,6 +175,12 @@ func ShowDaysLessons(item interface{}) {
 	if location, ok := scheduleItem["location"].(string); ok {
 		fmt.Print("Subject : ", location)
 	}
+	if startExamsDate, ok := scheduleItem["startExamsDate"].(string); ok {
+		fmt.Print("Exams Start : ", startExamsDate)
+	}
+	if endExamsDate, ok := scheduleItem["endExamsDate"].(string); ok {
+		fmt.Print("Exams End : ", endExamsDate)
+	}
 	fmt.Println()
 }
 
@@ -191,41 +197,7 @@ func ScheduleParse(client *http.Client, groupNumber int) ([]Exams, error) {
 		return nil, err
 	}
 
-	fmt.Println("--------------------------------Schedule--------------------------------")
-	fmt.Println("Monday : ")
-	for _, item := range data.Schedules.Monday {
-		ShowDaysLessons(item)
-	}
-	fmt.Println("Tuesday : ")
-	for _, item := range data.Schedules.Tuesday {
-		ShowDaysLessons(item)
-	}
-	fmt.Println("Wednesday : ")
-	for _, item := range data.Schedules.Wednesday {
-		ShowDaysLessons(item)
-	}
-	fmt.Println("Thursday : ")
-	for _, item := range data.Schedules.Thursday {
-		ShowDaysLessons(item)
-	}
-	fmt.Println("Friday : ")
-	for _, item := range data.Schedules.Friday {
-		ShowDaysLessons(item)
-	}
-	fmt.Println("Saturday : ")
-	for _, item := range data.Schedules.Saturday {
-		ShowDaysLessons(item)
-	}
-
-	fmt.Println("---------------------------Students group---------------------------")
-	el := data.StudentGroupDto
-	fmt.Println(el.Id, " ", el.CalendarId, " ", el.Name, " ",
-		el.FacultyId, " ", el.FacultyName, " ", el.Name, " ", el.Course)
-
-	fmt.Println("Start date : ", data.StartDate)
-	fmt.Println("End date : ", data.EndDate)
-	fmt.Println("Exams start date : ", data.StartExamsDate.(string))
-	fmt.Println("End exams date : ", data.EndExamsDate.(string))
+	ShowSchedule(&data)
 
 	return data.Exams, nil
 }
@@ -269,6 +241,76 @@ func GetWeakNumber(client *http.Client) int {
 		return -1
 	}
 	return weakNumber
+}
+
+func EmployeesScheduleParse(EmployeeId string, client *http.Client) {
+	body, err := GetBody("https://iis.bsuir.by/api/v1/employees/schedule/"+EmployeeId, client)
+	if err != nil {
+		fmt.Printf("Problem with response body : %s", err)
+		return
+	}
+
+	var data Schedule
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		fmt.Printf("Cant parse JSON : %s", err)
+		return
+	}
+	ShowSchedule(&data)
+}
+
+func ShowSchedule(data *Schedule) {
+	fmt.Println("--------------------------------Schedule--------------------------------")
+	fmt.Println("Monday : ")
+	for _, item := range data.Schedules.Monday {
+		if item != nil {
+			ShowDaysLessons(item)
+		}
+	}
+	fmt.Println("Tuesday : ")
+	for _, item := range data.Schedules.Tuesday {
+		if item != nil {
+			ShowDaysLessons(item)
+		}
+	}
+	fmt.Println("Wednesday : ")
+	for _, item := range data.Schedules.Wednesday {
+		if item != nil {
+			ShowDaysLessons(item)
+		}
+	}
+	fmt.Println("Thursday : ")
+	for _, item := range data.Schedules.Thursday {
+		if item != nil {
+			ShowDaysLessons(item)
+		}
+	}
+	fmt.Println("Friday : ")
+	for _, item := range data.Schedules.Friday {
+		if item != nil {
+			ShowDaysLessons(item)
+		}
+	}
+	fmt.Println("Saturday : ")
+	for _, item := range data.Schedules.Saturday {
+		if item != nil {
+			ShowDaysLessons(item)
+		}
+	}
+
+	fmt.Println("---------------------------Students group---------------------------")
+	el := data.StudentGroupDto
+	fmt.Println(el.Id, " ", el.CalendarId, " ", el.Name, " ",
+		el.FacultyId, " ", el.FacultyName, " ", el.Name, " ", el.Course)
+
+	fmt.Println("Start date : ", data.StartDate)
+	fmt.Println("End date : ", data.EndDate)
+	if _, ok := data.StartExamsDate.(string); ok {
+		fmt.Println("Exams start date : ", data.StartExamsDate.(string))
+	}
+	if _, ok := data.EndExamsDate.(string); ok {
+		fmt.Println("End exams date : ", data.EndExamsDate.(string))
+	}
 }
 
 func CreateReport(data interface{}, name string) (*os.File, error) {
@@ -334,12 +376,15 @@ func ReadFromFile(name string) {
 
 func ShowMenu(client http.Client) {
 	for {
-		fmt.Println("-----------------------Menu-----------------------\n\n", "Choose option")
+		fmt.Println("-----------------------Menu-----------------------\n", "Current weak number : ",
+			GetWeakNumber(&client), "\nChoose option")
 		fmt.Println("0) Exit")
 		fmt.Println("1) Schedule")
-		fmt.Println("2) Student group")
-		fmt.Println("3) Faculties")
-		fmt.Println("4) Employees")
+		fmt.Println("2) Exams")
+		fmt.Println("3) Student group")
+		fmt.Println("4) Faculties")
+		fmt.Println("5) Employees")
+		fmt.Println("6) Show Employees Schedule")
 
 		var choice int
 		_, err := fmt.Scan(&choice)
@@ -359,33 +404,41 @@ func ShowMenu(client http.Client) {
 					fmt.Printf("Input error : %s", err)
 					return
 				}
-				tmp, _ := ScheduleParse(&client, groupNumber)
+				ScheduleParse(&client, groupNumber)
+			}
 
-				fmt.Println("Do you wanna see exams?")
-				var ans string
-				_, err = fmt.Scan(&ans)
+		case 2:
+			{
+				var groupNumber int
+				fmt.Println("Enter group number : ")
+				_, err := fmt.Scan(&groupNumber)
 				if err != nil {
 					fmt.Printf("Input error : %s", err)
 					return
 				}
-				if ans == "yes" {
-					SeeExams(tmp)
-					if err := WriteJSONExams("json_test.txt", tmp); err != nil {
-						fmt.Printf("There are some error with writting in the file : %s", err)
-						return
-					}
-					fmt.Println("Successfully wrote!")
-				}
-			}
+				tmp, _ := ScheduleParse(&client, groupNumber)
 
-		case 2:
+				SeeExams(tmp)
+				if err := WriteJSONExams("json_test.txt", tmp); err != nil {
+					fmt.Printf("There are some error with writting in the file : %s", err)
+					return
+				}
+				fmt.Println("Successfully wrote!")
+			}
+		case 3:
 			data := StudentGroupsParse(&client)
 			_, _ = CreateReport(data, "output.txt")
-		case 3:
+		case 4:
 			data := FacultiesParse(&client)
 			_, _ = CreateReport(data, "output.txt")
-		case 4:
+		case 5:
 			EmployeeParse(&client)
+		case 6:
+			var Id string
+			fmt.Println("Enter employees data ")
+			fmt.Scan(&Id)
+			EmployeesScheduleParse(Id, &client)
+
 		case 0:
 			return
 		}
@@ -417,6 +470,5 @@ func main() {
 	_, _ = fmt.Scan(&name)
 	ReadFromFile(name)
 
-	fmt.Println("Current weak number : ", GetWeakNumber(&client))
 	ShowMenu(client)
 }
