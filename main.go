@@ -85,6 +85,13 @@ type Schedule struct {
 	EndExamsDate   interface{} `json:"endExamsDate"`
 }
 
+type studentGroups struct {
+	SpecialityName   string `json:"specialityName"`
+	SpecialityCode   string `json:"specialityCode"`
+	NumberOfStudents int    `json:"numberOfStudents"`
+	Name             int    `json:"name"`
+}
+
 func GetBody(url string, client *http.Client) ([]byte, error) {
 	response, err := client.Get(url)
 	if err != nil {
@@ -139,19 +146,22 @@ func StudentGroupsParse(client *http.Client) []Specialities {
 	return data
 }
 
-func EmployeeParse(client *http.Client) {
+func EmployeeParse(client *http.Client) []Employee {
 	body, err := GetBody("https://iis.bsuir.by/api/v1/employees/all", client)
 	if err != nil {
 		fmt.Printf("Problem with response body %s", err)
-		return
+		return nil
 	}
 	var data []Employee
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		fmt.Printf("Cant parse JSON : %s", err)
-		return
+		return nil
 	}
+	return data
+}
 
+func PrintEmployees(data []Employee) {
 	fmt.Println("---------------------------Employees---------------------------")
 	i := 1
 	for _, el := range data {
@@ -163,17 +173,48 @@ func EmployeeParse(client *http.Client) {
 
 func ShowDaysLessons(item interface{}) {
 	scheduleItem := item.(map[string]interface{})
+	studentGroups, ok := scheduleItem["studentGroups"].([]interface{})
+	if ok {
+		for _, el := range studentGroups {
+			group, ok := el.(map[string]string)
+			if ok {
+				fmt.Println("Speciality Name : ", group["SpecialityName"])
+				fmt.Println("Name of group : ", group["Name"])
+				fmt.Println("Number of students : ", group["NumberOfStudents"])
+			}
+		}
+	}
+
+	if numSubgroup, ok := scheduleItem["numSubgroup"].(int); ok {
+		fmt.Println("Num of subgroup : ", numSubgroup)
+	}
 	if subject, ok := scheduleItem["subject"].(string); ok {
-		fmt.Print("Subject : ", subject)
+		fmt.Println("Subject : ", subject)
+	}
+	if auditories, ok := scheduleItem["auditories"].([]string); ok {
+		fmt.Print("Auditories : ")
+		for _, el := range auditories {
+			fmt.Print(el, " ")
+		}
+		fmt.Println()
+	}
+	if lessonTypeAbbrev, ok := scheduleItem["lessonTypeAbbrev"].(string); ok {
+		fmt.Println("lesson Type : ", lessonTypeAbbrev)
+	}
+	if startLessonTime, ok := scheduleItem["startLessonTime"].(string); ok {
+		fmt.Println("Start Lesson Time : ", startLessonTime)
+	}
+	if endLessonTime, ok := scheduleItem["endLessonTime"].(string); ok {
+		fmt.Println("End Lesson Time : ", endLessonTime)
 	}
 	if startTime, ok := scheduleItem["startTime"].(string); ok {
-		fmt.Print("Subject : ", startTime)
+		fmt.Println("Start time : ", startTime)
 	}
 	if endTime, ok := scheduleItem["endTime"].(string); ok {
-		fmt.Print("Subject : ", endTime)
+		fmt.Print("End time : ", endTime)
 	}
 	if location, ok := scheduleItem["location"].(string); ok {
-		fmt.Print("Subject : ", location)
+		fmt.Print("Location : ", location)
 	}
 	if startExamsDate, ok := scheduleItem["startExamsDate"].(string); ok {
 		fmt.Print("Exams Start : ", startExamsDate)
@@ -198,8 +239,22 @@ func ScheduleParse(client *http.Client, groupNumber int) ([]Exams, error) {
 	}
 
 	ShowSchedule(&data)
-
 	return data.Exams, nil
+}
+
+func ExamsParse(client *http.Client, groupNumber int) {
+	body, err := GetBody("https://iis.bsuir.by/api/v1/schedule?studentGroup="+strconv.Itoa(groupNumber), client)
+	if err != nil {
+		fmt.Printf("Problem with response body %s", err)
+		return
+	}
+	var data Schedule
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		fmt.Printf("Cant parse JSON : %s", err)
+		return
+	}
+	SeeExams(data.Exams)
 }
 
 func SeeExams(exams []Exams) {
@@ -351,7 +406,6 @@ func WriteJSONExams(name string, data []Exams) error {
 	if err != nil {
 		return err
 	}
-
 	asJson, _ := json.MarshalIndent(data, "", "\t")
 	_, _ = file.Write(asJson)
 	return nil
@@ -374,17 +428,39 @@ func ReadFromFile(name string) {
 	println("Reading status: Success!")
 }
 
+func WriteExams(data []Exams, file *os.File) {
+	for _, el := range data {
+		file.WriteString(el.SubjectFullName + " " + el.StartLessonTime + " " + el.EndLessonTime + " " +
+			el.DateLesson + " " + el.LessonTypeAbbrev + "\n")
+	}
+}
+
+func WriteIntoFile(name string, data interface{}) {
+	file, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	defer file.Close()
+	if err != nil {
+		fmt.Printf("There are error with the file : %s", err)
+		return
+	}
+
+	if tmp, ok := data.([]Exams); ok {
+		WriteExams(tmp, file)
+	}
+}
+
 func ShowMenu(client http.Client) {
 	for {
-		fmt.Println("-----------------------Menu-----------------------\n", "Current weak number : ",
-			GetWeakNumber(&client), "\nChoose option")
+		fmt.Println("-----------------------Menu-----------------------\n", "Current Week Number : ",
+			GetWeakNumber(&client), "\nChoose Option")
 		fmt.Println("0) Exit")
 		fmt.Println("1) Schedule")
 		fmt.Println("2) Exams")
-		fmt.Println("3) Student group")
+		fmt.Println("3) Student Group")
 		fmt.Println("4) Faculties")
 		fmt.Println("5) Employees")
 		fmt.Println("6) Show Employees Schedule")
+		fmt.Println("7) Write Into file")
+		fmt.Println("8) Read From File")
 
 		var choice int
 		_, err := fmt.Scan(&choice)
@@ -416,15 +492,14 @@ func ShowMenu(client http.Client) {
 					fmt.Printf("Input error : %s", err)
 					return
 				}
-				tmp, _ := ScheduleParse(&client, groupNumber)
-
-				SeeExams(tmp)
-				if err := WriteJSONExams("json_test.txt", tmp); err != nil {
-					fmt.Printf("There are some error with writting in the file : %s", err)
-					return
-				}
-				fmt.Println("Successfully wrote!")
+				ExamsParse(&client, groupNumber)
+				//if err := WriteJSONExams("json_test.txt", tmp); err != nil {
+				//	fmt.Printf("There are some error with writting in the file : %s", err)
+				//	return
+				//}
+				//fmt.Println("Successfully wrote!")
 			}
+
 		case 3:
 			data := StudentGroupsParse(&client)
 			_, _ = CreateReport(data, "output.txt")
@@ -432,13 +507,28 @@ func ShowMenu(client http.Client) {
 			data := FacultiesParse(&client)
 			_, _ = CreateReport(data, "output.txt")
 		case 5:
-			EmployeeParse(&client)
+			data := EmployeeParse(&client)
+			PrintEmployees(data)
 		case 6:
-			var Id string
-			fmt.Println("Enter employees data ")
-			fmt.Scan(&Id)
-			EmployeesScheduleParse(Id, &client)
+			{
+				fmt.Println("Enter employees FIO")
+				var lstNme, frstNme, mdlNme string
+				fmt.Scan(&lstNme, &frstNme, &mdlNme)
 
+				data := EmployeeParse(&client)
+				for _, el := range data {
+					if el.FirstName == frstNme && el.MiddleName == mdlNme && el.LastName == lstNme {
+						EmployeesScheduleParse(el.UrlId, &client)
+					}
+				}
+			}
+
+		case 7:
+		case 8:
+			var name string
+			fmt.Println("Input file name with .txt")
+			_, _ = fmt.Scan(&name)
+			ReadFromFile(name)
 		case 0:
 			return
 		}
@@ -464,11 +554,5 @@ func ShowMenu(client http.Client) {
 
 func main() {
 	client := http.Client{}
-
-	var name string
-	fmt.Println("Input file name with .txt")
-	_, _ = fmt.Scan(&name)
-	ReadFromFile(name)
-
 	ShowMenu(client)
 }
